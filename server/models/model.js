@@ -55,7 +55,13 @@ class Model {
     let queryString = `SELECT * FROM ${this.tablename} WHERE ${parsedOptions.string.join(' AND ')} LIMIT 1`;
     return executeQuery(queryString, parsedOptions.values).then(results => results[0]);
   }
-
+  
+  checkUser(username) {
+    let queryString = 'SELECT * FROM users WHERE username = ?';
+    let args = [username];
+    return db.queryAsync(queryString, args);
+  }
+  
   /**
    * Creates a new record in the table.
    * @param {Object} options - An object with key/value pairs, where the keys should match

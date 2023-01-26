@@ -6,7 +6,7 @@
   "editor.tabSize": 2,
   "editor.wordWrap": "on",
   "emmet.showExpandedAbbreviation": "never",
-  "files.trimTrailingWhitespace": true,
+  "files.trimTrailingWhitespace": false,
   "javascript.suggest.enabled": false,
   "javascript.updateImportsOnFileMove.enabled": "never",
   "javascript.validate.enable": false

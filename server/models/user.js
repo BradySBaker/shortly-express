@@ -19,6 +19,11 @@ class Users extends Model {
    * @param {string} salt - The salt generated when the user signed up.
    * @returns {boolean} A boolean indicating if the attempted password was correct.
    */
+  
+  callCheckUser(username) {
+    return super.checkUser(username);
+  }
+
   compare(attempted, password, salt) {
     return utils.compareHash(attempted, password, salt);
   }
@@ -33,15 +38,13 @@ class Users extends Model {
    * @returns {Promise<Object>} A promise that is fulfilled with the result of
    * the record creation or rejected with the error that occured.
    */
-  create({ username, password }) {
+  create({username, password}) {
     let salt = utils.createRandom32String();
-
     let newUser = {
       username,
       salt,
       password: utils.createHash(password, salt)
     };
-
     return super.create.call(this, newUser);
   }
 }

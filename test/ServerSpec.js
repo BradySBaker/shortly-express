@@ -39,8 +39,8 @@ describe('', function() {
     /* TODO: Update user and password if different than on your local machine            */
     /*************************************************************************************/
     db = mysql.createConnection({
-      user: 'student',
-      password: 'student',
+      user: 'root',
+      password: 'MySQLKDD2022!',
       database: 'shortly'
     });
 
@@ -123,7 +123,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Creation:', function() {
+  describe('Account Creation:', function() {
 
     it('signup creates a new user record', function(done) {
       var options = {
@@ -147,7 +147,7 @@ describe('', function() {
       });
     });
 
-    it('does not store the user\'s original text password', function(done) {
+    it('does not store the user\'s original text password', function(done) { 
       var options = {
         'method': 'POST',
         'uri': 'http://127.0.0.1:4568/signup',
@@ -170,7 +170,7 @@ describe('', function() {
       });
     });
 
-    it('redirects to signup if the user already exists', function(done) {
+    it('redirects to signup if the user already exists', function(done) { //7 -------------------
       var options = {
         'method': 'POST',
         'uri': 'http://127.0.0.1:4568/signup',
