@@ -1,8 +1,8 @@
 const parseCookies = (req, res, next) => {
-  //console.log('HEADERS! ', req.headers);
+  //Create cookiesObj
+  //
   if (req.headers.cookie) {
     var cookies = req.headers.cookie.split(' ');
-    console.log('ARRAY', cookies);
     cookies.forEach((cookie) => {
       //Split var curCookie = [shortlyid, cookieDetails]
       var cookieDetails = cookie.split('=');
@@ -13,11 +13,9 @@ const parseCookies = (req, res, next) => {
       if (value[value.length - 1] === ';') {
         value = value.slice(0, value.length - 1);
       }
-      req.cookies[key] = value;
+      req._setCookiesVariable(key, value);
     });
   }
-  console.log(req.cookies);
-  //console.log('REQUEST', req);
   next();
 };
 

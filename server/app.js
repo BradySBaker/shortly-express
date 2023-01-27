@@ -3,6 +3,7 @@ const path = require('path');
 const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const Auth = require('./middleware/auth');
+// const Auth2 = require('./middleware/auth');
 const models = require('./models');
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(partials());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-
+// app.use(Auth.cookieParser());
 
 
 app.get('/', 
