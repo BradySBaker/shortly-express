@@ -20,8 +20,8 @@ class Users extends Model {
    * @returns {boolean} A boolean indicating if the attempted password was correct.
    */
   
-  callCheckUser(username) {
-    return super.checkUser(username);
+  checkUser(username) {
+    return super.get.call(this, {username});
   }
 
   compare(attempted, password, salt) {

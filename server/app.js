@@ -78,27 +78,36 @@ app.post('/links',
 /************************************************************/
 app.post('/signup', (req, res) => {
   // does user exists?
-  return models.Users.callCheckUser(req.body.username).then((data) => {
-    if (data.length !== 0) {
-      console.log('data', data);
-      res.redirect('/signup');
-    } else {
-      console.log("Couldn't find data", data);
-    }
-  });
-  return models.Users.create({username: req.body.username, password: req.body.password})
-    .then(() => {
-      res.status(201);
-      res.send(req.body);
+  models.Users.checkUser(req.body.username)
+    .then((data) => {
+      if (data) {
+        res.redirect(301, '/signup');
+      } else {
+        models.Users.create({username: req.body.username, password: req.body.password});
+        res.redirect(302, '/');
+      }
     })
-    .catch((err) => {
+    .catch ((err) => {
       res.send(err);
-      res.redirect('/signup');
     });
 });
 
 app.post('/login', (req, res) => {
-    
+  models.Users.checkUser(req.body.username)
+    .then((data) => {
+      if (data) {
+        if (models.Users.compare(req.body.password, data.password, data.salt)) {
+          res.redirect(302, '/');
+        } else {
+          res.redirect(302, '/login');
+        }
+      } else {
+        res.redirect(301, '/login');
+      }
+    })
+    .catch ((err) => {
+      res.send(err);
+    });
 });
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
