@@ -20,6 +20,10 @@ class Users extends Model {
    * @returns {boolean} A boolean indicating if the attempted password was correct.
    */
   
+  getUser(id) {
+    return super.get.call(this, {id});
+  }
+
   checkUser(username) {
     return super.get.call(this, {username});
   }

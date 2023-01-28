@@ -3,7 +3,7 @@ const path = require('path');
 const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const Auth = require('./middleware/auth');
-// const Auth2 = require('./middleware/auth');
+const Auth2 = require('./middleware/cookieParser');
 const models = require('./models');
 
 const app = express();
@@ -14,8 +14,8 @@ app.use(partials());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-// app.use(Auth.cookieParser());
-
+app.use(Auth2);
+app.use(Auth.createSession);
 
 app.get('/', 
   (req, res) => {
@@ -83,6 +83,7 @@ app.post('/signup', (req, res) => {
     .then((data) => {
       if (data) {
         res.redirect(301, '/signup');
+        //This is where you can set userId for current cookies
       } else {
         models.Users.create({username: req.body.username, password: req.body.password});
         res.redirect(302, '/');

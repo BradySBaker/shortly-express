@@ -1,6 +1,5 @@
 const parseCookies = (req, res, next) => {
-  //Create cookiesObj
-  //
+  var cookiesObj = {};
   if (req.headers.cookie) {
     var cookies = req.headers.cookie.split(' ');
     cookies.forEach((cookie) => {
@@ -13,9 +12,10 @@ const parseCookies = (req, res, next) => {
       if (value[value.length - 1] === ';') {
         value = value.slice(0, value.length - 1);
       }
-      req._setCookiesVariable(key, value);
+      cookiesObj[key] = value;
     });
   }
+  req['cookies'] = cookiesObj;
   next();
 };
 
