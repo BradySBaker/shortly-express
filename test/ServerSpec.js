@@ -147,6 +147,78 @@ describe('', function() {
       });
     });
 
+    it('signup creates a new user record with a new salt hash', function(done) {
+      var options = {
+        'method': 'POST',
+        'uri': 'http://127.0.0.1:4568/signup',
+        'json': {
+          'username': 'Samantha',
+          'password': 'Samantha'
+        }
+      };
+
+      request(options, function(error, res, body) {
+        var queryString = 'SELECT * FROM users where username = "Samantha"';
+        db.query(queryString, function(err, rows) {
+          if (err) { done(err); }
+          var user = rows[0];
+          expect(user).to.exist;
+          expect(user.username).to.equal('Samantha');
+          expect(user.salt).to.exist;
+          done();
+        });
+      });
+    });
+
+    it('signup creates a new user record with a new salt hash with type string', function(done) {
+      var options = {
+        'method': 'POST',
+        'uri': 'http://127.0.0.1:4568/signup',
+        'json': {
+          'username': 'Samantha',
+          'password': 'Samantha'
+        }
+      };
+
+      request(options, function(error, res, body) {
+        var queryString = 'SELECT * FROM users where username = "Samantha"';
+        db.query(queryString, function(err, rows) {
+          if (err) { done(err); }
+          var user = rows[0];
+          expect(user).to.exist;
+          expect(user.username).to.equal('Samantha');
+          expect(user.salt).to.exist;
+          expect(typeof (user.salt)).to.equal('string');
+          done();
+        });
+      });
+    });
+
+    it('Should only allow one instance of a username to sign up', function(done) {
+      var options = {
+        'method': 'POST',
+        'uri': 'http://127.0.0.1:4568/signup',
+        'json': {
+          'username': 'Samantha',
+          'password': 'Samantha',
+          'username': 'Samantha',
+          'password': 'Brownies'
+        }
+      };
+    
+      request(options, function(error, res, body) {
+        var queryString = 'SELECT * FROM users where username = "Samantha"';
+        db.query(queryString, function(err, rows) {
+          if (err) { done(err); }
+          var user = rows[0];
+          expect(user).to.exist;
+          expect(user.username).to.equal('Samantha');
+          expect(rows.length).to.not.equal(2);
+          done();
+        });
+      });
+    });
+
     it('does not store the user\'s original text password', function(done) { 
       var options = {
         'method': 'POST',
@@ -259,6 +331,23 @@ describe('', function() {
       });
     });
 
+    it('Users that enter the wrong username are kept on login page', function(done) {
+      var options = {
+        'method': 'POST',
+        'uri': 'http://127.0.0.1:4568/login',
+        'json': {
+          'username': 'Samanths',
+          'password': 'Samantha'
+        }
+      };
+
+      request(options, function(error, res, body) {
+        if (error) { return done(error); }
+        expect(res.headers.location).to.equal('/login');
+        done();
+      });
+    });
+
     it('Users that enter an incorrect password are kept on login page', function(done) {
       var options = {
         'method': 'POST',
@@ -331,6 +420,45 @@ describe('', function() {
 
     describe('Cookie Parser', function() {
 
+      it('parsed cookies on an object should have correct lengths', function(done) {
+        var requestWithoutCookies = httpMocks.createRequest();
+        var requestWithCookies = httpMocks.createRequest({
+          headers: {
+            Cookie: 'shortlyid=8a864482005bcc8b968f2b18f8f7ea490e577b20'
+          }
+        });
+        var requestWithMultipleCookies = httpMocks.createRequest({
+          headers: {
+            Cookie: 'shortlyid=18ea4fb6ab3178092ce936c591ddbb90c99c9f66; otherCookie=2a990382005bcc8b968f2b18f8f7ea490e990e78; anotherCookie=8a864482005bcc8b968f2b18f8f7ea490e577b20'
+          }
+        });
+
+        var response = httpMocks.createResponse();
+
+        cookieParser(requestWithoutCookies, response, function() {
+          var cookies = requestWithoutCookies.cookies;
+          var cookieKeys = Object.keys(cookies);
+          expect(cookies).to.be.an('object');
+          expect(cookieKeys.length).to.eql(0);
+        });
+
+        cookieParser(requestWithCookies, response, function() {
+          var cookies = requestWithCookies.cookies;
+          var cookieKeys = Object.keys(cookies);
+          expect(cookies).to.be.an('object');
+          expect(cookieKeys.length).to.eql(1);
+        });
+
+        cookieParser(requestWithMultipleCookies, response, function() {
+          var cookies = requestWithMultipleCookies.cookies;
+          var cookieKeys = Object.keys(cookies);
+          expect(cookies).to.be.an('object');
+          expect(cookieKeys.length).to.eql(3);
+          done();
+        });
+      });
+    
+
       it('parses cookies and assigns an object of key-value pairs to a session property on the request', function(done) {
         var requestWithoutCookies = httpMocks.createRequest();
         var requestWithCookies = httpMocks.createRequest({
@@ -371,6 +499,7 @@ describe('', function() {
       });
     });
 
+
     describe('Session Parser', function() {
       it('initializes a new session when there are no cookies on the request', function(done) {
         var requestWithoutCookies = httpMocks.createRequest();
@@ -396,6 +525,7 @@ describe('', function() {
           done();
         });
       });
+
 
       it('assigns a session object to the request if a session already exists', function(done) {
 
