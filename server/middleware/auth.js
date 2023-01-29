@@ -4,16 +4,16 @@ const Promise = require('bluebird');
 module.exports.createSession = (req, res, next) => {
   //If we have cookies-
 
-    //If cookies in database
-      //Do not create session
-      //Set session variables
-    //Else if cookies not in database
-      //Create Session
-      //Set session variables
+  //If cookies in database
+  //Do not create session
+  //Set session variables
+  //Else if cookies not in database
+  //Create Session
+  //Set session variables
 
   //If we dont have cookies-
-    //Create Session
-    //Set session variables
+  //Create Session
+  //Set session variables
   if (!req.cookies.shortlyid) {
     models.Sessions.create()
       .then((queryResults) => {
@@ -48,7 +48,7 @@ module.exports.createSession = (req, res, next) => {
         }
       })
       .catch((err) => {
-        console.log('ERROR=====>', err);
+        console.log('Create Session Error!', err);
         res.send(err);
       });
   }
@@ -59,6 +59,7 @@ module.exports.createSession = (req, res, next) => {
 /************************************************************/
 
 module.exports.assignUser = function(req, res, next, data) {
+  console.log('Assigning user redirecting to /');
   //module.Session.userId({id: sessionId}, {userId: currentUsersId})
   var sessionData = null;
   models.Sessions.get({hash: req.session.hash})
@@ -71,7 +72,6 @@ module.exports.assignUser = function(req, res, next, data) {
       next();
     })
     .catch((err) => {
-      console.log(err);
       res.send(err);
     });
 };
@@ -82,10 +82,19 @@ module.exports.deleteSession = function(req, res, next) {
       delete req['session'];
       delete req['cookie'];
       res.cookie('shortlyid', undefined);
-      console.log(res);
       next();
     })
     .catch((err) => {
-      console.log(err);
+      console.log('Delete Session error', err);
     });
+};
+
+module.exports.verifySession = function(req, res, next) {
+  // console.log(res);
+  if (models.Sessions.isLoggedIn(req.session)) {
+    next();
+  } else {
+    console.log('Redirecting to /login');
+    res.redirect('/login');
+  }
 };

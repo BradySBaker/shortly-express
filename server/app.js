@@ -17,17 +17,22 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(Auth2);
 app.use(Auth.createSession);
 
-app.get('/', 
+app.get('/', Auth.verifySession, 
   (req, res) => {
     res.render('index');
   });
 
-app.get('/create', 
+app.get('/create', Auth.verifySession,
   (req, res) => {
     res.render('index');
   });
+
+app.get('/login',
+  (req, res) => {
+    res.render('login');
+  });
    
-app.get('/links', 
+app.get('/links', Auth.verifySession,
   (req, res, next) => {
     models.Links.getAll()
       .then(links => {
@@ -82,15 +87,17 @@ app.post('/signup', (req, res) => {
   models.Users.checkUser(req.body.username)
     .then((data) => {
       if (data) {
-        res.redirect(301, '/signup');
+        res.redirect('/signup');
       } else {
         models.Users.create({username: req.body.username, password: req.body.password});
         Auth.assignUser(req, res, () => {
-          res.redirect(302, '/');
+          console.log('Redirecting to index in /signup route');
+          res.redirect('/');
         });
       }
     })
     .catch ((err) => {
+      console.log('THIS NODE ERROR', err);
       res.send(err);
     });
 });
@@ -101,23 +108,24 @@ app.post('/login', (req, res) => {
       if (data) {
         if (models.Users.compare(req.body.password, data.password, data.salt)) {
           Auth.assignUser(req, res, () => {
-            res.redirect(302, '/');
+            res.redirect('/');
           });
         } else {
-          res.redirect(302, '/login');
+          res.redirect('/login');
         }
       } else {
-        res.redirect(301, '/login');
+        res.redirect('/login');
       }
     })
     .catch ((err) => {
+      console.log('Check User Error', err);
       res.send(err);
     });
 });
 
 app.get('/logout', (req, res) => {
   Auth.deleteSession(req, res, () => {
-    res.redirect(301, '/login');
+    res.redirect('/login');
   });
 });
 /************************************************************/
@@ -146,6 +154,7 @@ app.get('/:code', (req, res, next) => {
       res.status(500).send(error);
     })
     .catch(() => {
+      console.log('Redirecting to index!');
       res.redirect('/');
     });
 });

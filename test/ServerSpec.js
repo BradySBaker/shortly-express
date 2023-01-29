@@ -9,7 +9,7 @@ var port = 4568;
 
 /************************************************************/
 // Mocha doesn't have a way to designate pending before blocks.
-// Mimic the behavior of xit and xdescribe with xbeforeEach.
+// Mimic the behavior of xit and describe with xbeforeEach.
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
@@ -597,7 +597,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Link creation:', function() {
+  describe('Link creation:', function() {
 
     var cookies = request.jar();
     var requestWithSession = request.defaults({ jar: cookies });
@@ -610,7 +610,7 @@ describe('', function() {
       }
     };
 
-    xbeforeEach(function(done) {
+    beforeEach(function(done) {
       var options = {
         'method': 'POST',
         'followAllRedirects': true,
