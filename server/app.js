@@ -83,10 +83,11 @@ app.post('/signup', (req, res) => {
     .then((data) => {
       if (data) {
         res.redirect(301, '/signup');
-        //This is where you can set userId for current cookies
       } else {
         models.Users.create({username: req.body.username, password: req.body.password});
-        res.redirect(302, '/');
+        Auth.assignUser(req, res, () => {
+          res.redirect(302, '/');
+        });
       }
     })
     .catch ((err) => {
@@ -99,7 +100,9 @@ app.post('/login', (req, res) => {
     .then((data) => {
       if (data) {
         if (models.Users.compare(req.body.password, data.password, data.salt)) {
-          res.redirect(302, '/');
+          Auth.assignUser(req, res, () => {
+            res.redirect(302, '/');
+          });
         } else {
           res.redirect(302, '/login');
         }
@@ -110,6 +113,12 @@ app.post('/login', (req, res) => {
     .catch ((err) => {
       res.send(err);
     });
+});
+
+app.get('/logout', (req, res) => {
+  Auth.deleteSession(req, res, () => {
+    res.redirect(301, '/login');
+  });
 });
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail

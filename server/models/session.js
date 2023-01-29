@@ -22,7 +22,13 @@ class Sessions extends Model {
   isLoggedIn(session) {
     return !!session.user;
   }
-
+  deleteUserSession(options) {
+    return super.delete.call(this, options);
+  }
+  //Will need and the column name session id and the user id
+  setUserId(options, value) {
+    return super.update.call(this, options, value);
+  }
   /**
    * Gets one record in the table matching specified conditions, and attaches user
    * information if the userId is present on the session object.

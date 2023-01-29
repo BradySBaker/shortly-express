@@ -57,3 +57,35 @@ module.exports.createSession = (req, res, next) => {
 /************************************************************/
 // Add additional authentication middleware functions below
 /************************************************************/
+
+module.exports.assignUser = function(req, res, next, data) {
+  //module.Session.userId({id: sessionId}, {userId: currentUsersId})
+  var sessionData = null;
+  models.Sessions.get({hash: req.session.hash})
+    .then((data) => {
+      sessionData = data;
+      return models.Users.checkUser(req.body.username);
+    })
+    .then((userData) => {
+      models.Sessions.setUserId({id: sessionData.id}, {userId: userData.id});
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send(err);
+    });
+};
+
+module.exports.deleteSession = function(req, res, next) {
+  models.Sessions.deleteUserSession({hash: req.session.hash})
+    .then(() => {
+      delete req['session'];
+      delete req['cookie'];
+      res.cookie('shortlyid', undefined);
+      console.log(res);
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
